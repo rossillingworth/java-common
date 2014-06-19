@@ -14,6 +14,7 @@
     <packaging>jar</packaging>
 
     <name>Library of common classes for java development</name>
+    <inceptionYear>2014</inceptionYear>
     <description>Provides location for common utilities and base classes for java development</description>
     <url>https://github.com/rossillingworth/java-common</url>
    
@@ -152,6 +153,31 @@
                         <phase>verify</phase>
                         <goals>
                             <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <header>com/mycila/maven/plugin/license/templates/MPL-2.txt</header>
+                    <properties>
+                        <owner>Techmale</owner>
+                        <email>oss@techmale.com</email>
+                    </properties>
+                    <excludes>
+                        <exclude>pom.xml</exclude>
+                        <exclude>**/README</exclude>
+                        <exclude>src/test/resources/**</exclude>
+                        <exclude>src/main/resources/**</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
