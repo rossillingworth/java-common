@@ -7,18 +7,32 @@
  */
 package com.techmale.util.exceptions;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 
 /**
-
+ * <h4>Exception extensions - making Exceptions easier.</h4>
  *
- * Exception extensions - making Exceptions easier to use.
+ * <p>
+ * Replaces the exception boilerplate with a single line
+ * producing better and more readable code. Contains both
+ * checked and unchecked exceptions.
+ * </p>
  *
- * Exception.when(condition,message[,string format varArgs])
+ * <h5>Setup:</h5>
  *
+ * <pre>
+ *     {@code
+ *  import static com.techmale.util.exceptions.ExceptionExtensions.*;
+ *     }
+ * </pre>
+ *
+ * <h5>Usage</h5>
+ * <pre>
+ *     {@code
+ *  IllegalArgumentException.when(myVar.equals("Foo"), "Bad value for myVar: %s", myvar);
+ *     }
+ * </pre>
  */
 public class ExceptionExtensions<T extends Exception> {
 
@@ -30,44 +44,62 @@ public class ExceptionExtensions<T extends Exception> {
     // checked Exceptions
     public static final ExceptionExtensions<FileNotFoundException> FileNotFoundException = new ExceptionExtensions(FileNotFoundException.class);
 
-    private Class clazz;
+    private Class exceptionClass;
 
     /**
      * Instantiate Exception Extension
      *
-     * @param clazz Class of RuntimeException type to throw
+     * @param exceptionClass Exception Class
      */
-    protected ExceptionExtensions(Class clazz) {
-        this.clazz = clazz;
+    protected ExceptionExtensions(Class exceptionClass) {
+        this.exceptionClass = exceptionClass;
     }
 
+
     /**
-     * Exception.when allows for better and more readable code
-     * see tests for examples.
+     * Exception.when throws exception when the condition is true
      *
      * @param condition If true, then exception is thrown
      * @param msg       Msg to display (uses String.format)
      * @param args      optional varArgs for string format
+     * @throws T
      */
     public void when(boolean condition, String msg, Object... args) throws T {
         if (condition) {
-            try {
-                String formattedMessage = String.format(msg, args);
-                throw (T) clazz.getConstructor(String.class).newInstance(formattedMessage);
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
+            throwException(msg, args);
         }
     }
 
-    public static void main(String[] args) {
 
+    /**
+     * Exception.ifNull throws exception if the passed object is null
+     *
+     * @param o    object to check if null
+     * @param msg  Msg to display (uses String.format)
+     * @param args optional varArgs for string format
+     * @throws T
+     */
+    public void ifNull(Object o, String msg, Object... args) throws T {
+        when(o == null, msg, args);
+    }
+
+
+    /**
+     * Throws exception with a formatted message, this should only be
+     * called if you are extending this class.
+     *
+     * @param msg  Msg to display (uses String.format)
+     * @param args optional varArgs for string format
+     * @throws T
+     */
+    protected void throwException(String msg, Object[] args) throws T {
         try {
-            FileNotFoundException.when(true,"");
-        } catch (java.io.FileNotFoundException e) {
+            String formattedMessage = String.format(msg, args);
+            throw (T) exceptionClass.getConstructor(String.class).newInstance(formattedMessage);
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
+            System.exit(1);
         }
-
     }
+
 }
